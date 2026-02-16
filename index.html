@@ -895,11 +895,11 @@
             const canvas = document.getElementById('office-canvas');
             console.log('Canvas found:', canvas);
             
-            if (canvas && typeof PokemonBattleGen1 !== 'undefined') {
-                window.pokemonBattle = new PokemonBattleGen1(canvas);
+            if (canvas && typeof PokemonBattleAnimated !== 'undefined') {
+                window.pokemonBattle = new PokemonBattleAnimated(canvas);
                 console.log('✅ Pokemon Battle initialized');
             } else {
-                console.error('❌ Pokemon Battle failed:', { canvas, PokemonBattleGen1: typeof PokemonBattleGen1 });
+                console.error('❌ Pokemon Battle failed:', { canvas, PokemonBattleAnimated: typeof PokemonBattleAnimated });
             }
         });
         
@@ -1014,11 +1014,27 @@
             }
         }
         
-        // Connect WebSocket - auto-detect hostname and protocol
+        // Connect WebSocket - configurable bridge URL
         console.log('🔌 Connecting to bridge...');
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsHost = window.location.host || 'localhost:3737';
-        const wsUrl = `${wsProtocol}//${wsHost}`;
+        
+        // Check for bridge URL in localStorage or URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const bridgeParam = urlParams.get('bridge');
+        
+        let wsUrl = localStorage.getItem('triedge_bridge_url');
+        
+        if (bridgeParam) {
+            wsUrl = bridgeParam;
+            localStorage.setItem('triedge_bridge_url', bridgeParam);
+            console.log('📝 Saved bridge URL from parameter');
+        }
+        
+        if (!wsUrl) {
+            // Default to ngrok tunnel
+            wsUrl = 'wss://integrally-unfooling-kazuko.ngrok-free.dev';
+            localStorage.setItem('triedge_bridge_url', wsUrl);
+        }
+        
         console.log('🌐 WebSocket URL:', wsUrl);
         const ws = new WebSocket(wsUrl);
         
