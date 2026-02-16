@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=0.5, user-scalable=yes, viewport-fit=cover">
+    <title>🔱 TriEdge Inc. - Pokemon Battle v5 DEBUG</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TriEdge">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f380f">
+    <meta name="msapplication-navbutton-color" content="#0f380f">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167.png">
+    <style>
+        /* CSS v2.6 - iPad PWA responsive fix - 2026-02-13 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+        }
+        
+        body {
+            background: #0f380f;
+            font-family: 'Monaco', 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #9bbc0f;
+            overflow: auto;
+        }
+        
+        #main-container {
+            display: flex;
+            gap: 20px;
+            padding: 10px;
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            max-height: 100vh;
+            margin: 0;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: calc(10px + env(safe-area-inset-left));
+            padding-right: calc(10px + env(safe-area-inset-right));
+        }
+        
+        /* iPad and tablets - side by side, scaled down */
+        /* v2.6 - Force scale with !important for PWA cache refresh */
+        @media (max-width: 1100px) and (min-width: 768px) {
+            body {
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            
+            #main-container {
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: flex-start;
+                height: 100vh;
+                width: 100%;
+                gap: 10px;
+                padding: 10px;
+                padding-top: calc(10px + env(safe-area-inset-top));
+            }
+            
+            #gameboy-section {
+                flex: 0 0 auto;
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                width: 220px;
+                height: 500px;
+                overflow: visible;
+            }
+            
+            #gameboy-shell {
+                transform: scale(0.35) !important;
+                transform-origin: top center !important;
+                width: 600px;
+                height: 800px;
+            }
+            
+            #terminal-section {
+                flex: 1 1 auto !important;
+                min-width: 300px;
+                max-width: calc(100vw - 240px);
+                height: 500px !important;
+                min-height: 500px !important;
+                max-height: 500px !important;
+                border-radius: 8px;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden !important;
+            }
+            
+            #terminal-body {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                min-height: 0;
+            }
+            
+            #terminal-output {
+                flex: 1;
+                overflow-y: auto !important;
+                overflow-x: hidden;
+                min-height: 0;
+            }
+            
+            #typing-indicator {
+                flex: 0 0 auto;
+            }
+            
+            #terminal-input-container {
+                flex: 0 0 auto;
+            }
+        }
+        
+        /* Smaller tablets / iPad Mini portrait - stack vertically */
+        /* v2.6 - Force scale for portrait mode */
+        @media (max-width: 767px) and (min-width: 500px) {
+            body {
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            
+            #main-container {
+                flex-direction: column;
+                align-items: center;
+                height: auto;
+                min-height: 100vh;
+                width: 100%;
+                gap: 10px;
+                padding: 10px;
+                padding-top: calc(10px + env(safe-area-inset-top));
+            }
+            
+            #gameboy-section {
+                flex: 0 0 auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                height: 300px;
+                overflow: visible;
+            }
+            
+            #gameboy-shell {
+                transform: scale(0.38) !important;
+                transform-origin: center center !important;
+                width: 600px;
+                height: 800px;
+            }
+            
+            #terminal-section {
+                flex: 1;
+                width: 100%;
+                min-width: unset;
+                min-height: 350px;
+                border-radius: 8px;
+            }
+            
+            #terminal-output {
+                max-height: 45vh;
+            }
+        }
+        
+        /* iPhone - perfect square stack with FULL GameBoy design */
+        @media (max-width: 499px) {
+            body {
+                overflow-y: scroll;
+                background: #000;
+                align-items: flex-start;
+            }
+            
+            #main-container {
+                flex-direction: column;
+                padding: 0;
+                gap: 0;
+                width: 100vw;
+                min-height: 200vw;
+                align-items: center;
+                justify-content: flex-start;
+            }
+            
+            /* GameBoy Perfect Square */
+            #gameboy-section {
+                width: 100vw;
+                height: 100vw;
+                min-height: 100vw;
+                max-height: 100vw;
+                display: flex !important;
+                justify-content: center;
+                align-items: center;
+                background: #0f380f;
+                overflow: hidden;
+                flex: 0 0 100vw;
+                position: relative;
+            }
+            
+            #gameboy-shell {
+                transform: scale(0.6) !important;
+                transform-origin: center center !important;
+                width: 600px;
+                height: 800px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                margin-left: -300px;
+                margin-top: -400px;
+                /* All desktop styles preserved - shell, border, buttons, d-pad, etc. */
+            }
+            
+            /* Terminal Perfect Square */
+            #terminal-section {
+                width: 100vw;
+                height: 100vw;
+                min-height: 100vw;
+                max-height: 100vw;
+                flex: 0 0 100vw;
+                border-radius: 0;
+                border-top: 2px solid #000;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            #terminal-header {
+                padding: 12px;
+                flex: 0 0 auto;
+            }
+            
+            #terminal-header h2 {
+                font-size: 13px;
+            }
+            
+            #terminal-body {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                padding: 10px;
+            }
+            
+            #terminal-output {
+                flex: 1;
+                overflow-y: auto;
+                font-size: 11px;
+                line-height: 1.4;
+            }
+            
+            #terminal-input-container {
+                flex: 0 0 auto;
+                padding: 10px;
+            }
+            
+            #terminal-input {
+                font-size: 12px;
+            }
+            
+            #send-button {
+                font-size: 11px;
+                padding: 8px 16px;
+            }
+        }
+        
+        /* Left: GameBoy Shell */
+        /* v2.6 - Explicit dimensions for proper transform scaling */
+        #gameboy-section {
+            flex: 0 0 auto;
+        }
+        
+        #gameboy-shell {
+            background: linear-gradient(135deg, #a0a0a0, #808080);
+            border: 8px solid #707070;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            width: 600px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        #shell-top {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .power-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .power-label {
+            font-family: 'Arial', sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .power-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff0000;
+            box-shadow: 0 0 8px #ff0000, 0 0 15px #ff6666;
+            animation: led-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes led-pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 8px #ff0000, 0 0 15px #ff6666; }
+            50% { opacity: 0.8; box-shadow: 0 0 4px #ff0000, 0 0 8px #ff6666; }
+        }
+        
+        .brand-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .brand-dot {
+            color: #880088;
+            font-size: 14px;
+        }
+        
+        .brand-name {
+            font-size: 24px;
+            font-weight: bold;
+            font-style: italic;
+            color: #333;
+            text-shadow: 1px 1px 0 #666;
+            letter-spacing: 3px;
+        }
+        
+        #canvas-wrapper {
+            border: 6px solid #0f380f;
+            background: #8bac0f;
+            box-shadow: 
+                inset 0 0 20px rgba(15, 56, 15, 0.5),
+                0 0 30px rgba(139, 172, 15, 0.4);
+            width: 100%;
+            max-width: 560px;
+            aspect-ratio: 160 / 144;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        #office-canvas {
+            display: block;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            -ms-interpolation-mode: nearest-neighbor;
+            width: 560px;
+            height: 504px;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        #controls {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .dpad {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            background: radial-gradient(circle, #d0d0d0, #a0a0a0);
+            border-radius: 50%;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .dpad:active {
+            transform: scale(0.98);
+        }
+        
+        .dpad-cross {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+        }
+        
+        .dpad-cross::before,
+        .dpad-cross::after {
+            content: '';
+            position: absolute;
+            background: linear-gradient(135deg, #2a2a2a, #0a0a0a);
+            border: 1px solid #000;
+            border-radius: 4px;
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.1),
+                0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .dpad-cross::before {
+            width: 70px;
+            height: 22px;
+            top: 24px;
+            left: 0;
+        }
+        
+        .dpad-cross::after {
+            height: 70px;
+            width: 22px;
+            top: 0;
+            left: 24px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .button {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #8b3a5c 0%, #5a1f3a 50%, #3a0a1f 100%);
+            border: 3px solid #2a0a1a;
+            box-shadow: 
+                inset 0 3px 6px rgba(255, 255, 255, 0.2),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.5),
+                0 4px 8px rgba(0, 0, 0, 0.4);
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+        
+        .button:active {
+            transform: scale(0.95);
+            box-shadow: 
+                inset 0 2px 4px rgba(0, 0, 0, 0.6),
+                0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        
+        .button::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            height: 35%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent);
+            border-radius: 50%;
+        }
+        
+        .button-label {
+            color: #000;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+        }
+        
+        /* Right: Terminal - BASE STYLES */
+        #terminal-section {
+            flex: 0 0 600px;
+            display: flex;
+            flex-direction: column;
+            min-width: 300px;
+            max-width: 600px;
+            height: 600px;
+            min-height: 600px;
+            max-height: 600px;
+            background: #0a0a0a;
+            overflow: hidden;
+        }
+        
+        #terminal-header {
+            background: linear-gradient(135deg, #0f380f, #1a4a1a);
+            border: 3px solid #9bbc0f;
+            border-bottom: none;
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            flex: 0 0 auto;  /* Don't grow */
+            min-height: 0;
+        }
+        
+        #terminal-header h2 {
+            font-size: 14px;
+            color: #9bbc0f;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ff6b6b, #e53935 40%, #b71c1c 100%);
+            box-shadow: 
+                0 0 4px #ff0000,
+                0 0 8px #ff0000,
+                0 0 16px rgba(255, 0, 0, 0.6),
+                0 0 24px rgba(255, 0, 0, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            border: 1px solid #7f0000;
+        }
+        
+        #terminal-body {
+            flex: 1;
+            background: #0a0a0a;
+            border: 3px solid #9bbc0f;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        #terminal-output {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #9bbc0f;
+            background: #0a0a0a;
+        }
+        
+        #terminal-output::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        #terminal-output::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        
+        #terminal-output::-webkit-scrollbar-thumb {
+            background: #9bbc0f;
+            border-radius: 5px;
+        }
+        
+        .terminal-line {
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+        
+        .terminal-prompt {
+            color: #9bbc0f;
+            font-weight: bold;
+        }
+        
+        .terminal-input-line {
+            color: #8bac0f;
+        }
+        
+        .terminal-response {
+            color: #4ecdc4;
+            padding-left: 20px;
+            border-left: 3px solid #4ecdc4;
+            margin-left: 10px;
+            background: rgba(78, 205, 196, 0.1);
+            padding: 8px 12px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .terminal-user {
+            color: #9bbc0f;
+        }
+        
+        .terminal-error {
+            color: #ef4444;
+            padding-left: 20px;
+        }
+        
+        .terminal-system {
+            color: #306230;
+            font-style: italic;
+        }
+        
+        .terminal-typing {
+            color: #9bbc0f;
+            font-style: italic;
+            padding-left: 20px;
+        }
+        
+        .typing-dots {
+            display: inline-block;
+        }
+        
+        .typing-dots .dot {
+            animation: typing-blink 1.4s infinite;
+            opacity: 0;
+        }
+        
+        .typing-dots .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dots .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing-blink {
+            0%, 20%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        /* Chat Message Styles */
+        .message-wrapper {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message-user {
+            align-items: flex-end;
+        }
+        
+        .message-deshon {
+            align-items: flex-start;
+        }
+        
+        .message-content {
+            padding: 8px 12px;
+            border-radius: 6px;
+            max-width: 80%;
+            word-wrap: break-word;
+            position: relative;
+        }
+        
+        .message-user .message-content {
+            background: #306230;
+            color: #9bbc0f;
+            border: 1px solid #8bac0f;
+        }
+        
+        .message-user .message-content::before {
+            content: "Ψ $ ";
+            color: #9bbc0f;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+        
+        .message-deshon .message-content {
+            background: #0f380f;
+            color: #8bac0f;
+            border: 1px solid #306230;
+        }
+        
+        .message-deshon .message-content::before {
+            content: "🔱 DESHON: ";
+            color: #9bbc0f;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+        
+        .message-timestamp {
+            font-size: 9px;
+            color: #306230;
+            margin-top: 3px;
+            padding: 0 4px;
+        }
+        
+        /* Typing Indicator */
+        #typing-indicator {
+            display: none;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            color: #8bac0f;
+            font-style: italic;
+            flex: 0 0 auto;  /* Don't grow */
+            min-height: 0;
+        }
+        
+        #typing-indicator.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .typing-dots {
+            display: inline-block;
+            animation: typingDots 1.5s infinite;
+        }
+        
+        @keyframes typingDots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .typing-dots::after {
+            content: '...';
+            animation: typingAnimation 1.5s infinite;
+        }
+        
+        @keyframes typingAnimation {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        /* Smooth Scroll */
+        #terminal-output {
+            scroll-behavior: smooth;
+        }
+        
+        #terminal-input-container {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #0f380f;
+            border-top: 1px solid #9bbc0f;
+            flex: 0 0 auto;  /* Don't grow */
+            min-height: 0;
+        }
+        
+        .input-prompt {
+            color: #9bbc0f;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        
+        #terminal-input {
+            flex: 1;
+            background: #0a0a0a;
+            border: 2px solid #306230;
+            color: #9bbc0f;
+            padding: 8px 12px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        #terminal-input:focus {
+            border-color: #9bbc0f;
+            box-shadow: 0 0 10px rgba(155, 188, 15, 0.3);
+        }
+        
+        #send-button {
+            background: linear-gradient(135deg, #9bbc0f, #8bac0f);
+            border: none;
+            color: #0f380f;
+            padding: 8px 20px;
+            margin-left: 10px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+        
+        #send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(155, 188, 15, 0.4);
+        }
+        
+        #send-button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div id="main-container">
+        <!-- Left: GameBoy Shell -->
+        <div id="gameboy-section">
+            <div id="gameboy-shell">
+                <!-- Top label and power indicator -->
+                <div id="shell-top">
+                    <div class="power-indicator">
+                        <span class="power-label">BATTERY</span>
+                        <div class="power-led"></div>
+                    </div>
+                    <div class="brand-label">
+                        <span class="brand-name">RICH<span style="color: #8b3a5c;">BOY</span></span>
+                    </div>
+                </div>
+                
+                <div id="canvas-wrapper">
+                    <canvas id="office-canvas"></canvas>
+                </div>
+                
+                <div id="controls">
+                    <div class="dpad">
+                        <div class="dpad-cross"></div>
+                    </div>
+                    <div class="buttons">
+                        <div class="button-group">
+                            <div class="button"></div>
+                            <span class="button-label">B</span>
+                        </div>
+                        <div class="button-group">
+                            <div class="button"></div>
+                            <span class="button-label">A</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right: Terminal -->
+        <div id="terminal-section">
+            <div id="terminal-header">
+                <h2>
+                    DESHON TERMINAL
+                </h2>
+            </div>
+            <div id="terminal-body">
+                <div id="terminal-output">
+                    <div class="terminal-line terminal-system">🎮 Pokemon Battle System - Terminal Active</div>
+                    <div class="terminal-line terminal-system">A wild PIKACHU appeared! Go CHARMANDER!</div>
+                    <div class="terminal-line terminal-system">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+                </div>
+                <div id="typing-indicator">
+                    🔱 Deshon is typing<span class="typing-dots"></span>
+                </div>
+                <div id="terminal-input-container">
+                    <span class="input-prompt">🔱 $</span>
+                    <input type="text" id="terminal-input" placeholder="Enter command..." autocomplete="off" />
+                    <button id="send-button">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="pokemon-battle-animated.js?v=5"></script>
+    <script>
+        // Initialize Pokemon Battle on load - FORCED POKEMON ONLY
+        window.addEventListener('load', () => {
+            console.log('🎮 LOADING POKEMON BATTLE...');
+            const canvas = document.getElementById('office-canvas');
+            console.log('Canvas found:', canvas);
+            
+            if (canvas && typeof PokemonBattleGen1 !== 'undefined') {
+                window.pokemonBattle = new PokemonBattleGen1(canvas);
+                console.log('✅ Pokemon Battle initialized');
+            } else {
+                console.error('❌ Pokemon Battle failed:', { canvas, PokemonBattleGen1: typeof PokemonBattleGen1 });
+            }
+        });
+        
+        // iOS-friendly global error handler
+        window.addEventListener('error', (e) => {
+            console.error('💥 Global error:', e.message, 'at', e.filename, 'line', e.lineno);
+            const output = document.getElementById('terminal-output');
+            if (output) {
+                const div = document.createElement('div');
+                div.className = 'terminal-line terminal-error';
+                div.textContent = `💥 ERROR: ${e.message}`;
+                output.appendChild(div);
+            }
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('💥 Unhandled promise rejection:', e.reason);
+        });
+    </script>
+    <script>
+        // INLINE WEBSOCKET - PROVEN TO WORK
+        const output = document.getElementById('terminal-output');
+        const input = document.getElementById('terminal-input');
+        const sendBtn = document.getElementById('send-button');
+        const typingDiv = document.getElementById('typing-indicator');
+        
+        function addLine(text, className) {
+            const div = document.createElement('div');
+            div.className = 'terminal-line ' + (className || '');
+            div.innerHTML = text;
+            output.appendChild(div);
+            // Force scroll to bottom - multiple methods for iOS compatibility
+            scrollToBottom();
+        }
+        
+        function scrollToBottom() {
+            // Method 1: Classic scrollTop
+            output.scrollTop = output.scrollHeight;
+            // Method 2: Delayed for iOS rendering
+            setTimeout(() => {
+                output.scrollTop = output.scrollHeight;
+                // Method 3: scrollIntoView on last element
+                const lastLine = output.lastElementChild;
+                if (lastLine) {
+                    lastLine.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+            }, 50);
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Track active sub-agents
+        const activeAgents = new Map();
+        
+        function detectSpawnedAgents(message) {
+            // Look for spawn patterns in my responses
+            const spawnPatterns = [
+                /spawn(?:ing|ed)?\s+(?:a\s+)?(?:sub-?)?agents?\s*(?:to|for|:)?\s*["']?([^"'\n]+)/gi,
+                /(\w+[-\w]*agent)\s+(?:is\s+)?(?:working|running|deployed)/gi,
+                /specialists?\s+deployed/gi,
+                /agents?\s+working\s+(?:on|in)/gi
+            ];
+            
+            let foundSpawn = false;
+            for (const pattern of spawnPatterns) {
+                if (pattern.test(message)) {
+                    foundSpawn = true;
+                    break;
+                }
+            }
+            
+            if (foundSpawn && window.triedgeOffice) {
+                // Extract agent names/labels
+                const labelMatch = message.match(/label[=:]["']?([^"'\s]+)/i);
+                const label = labelMatch ? labelMatch[1] : 'worker-' + Date.now();
+                
+                const agent = window.triedgeOffice.addSubAgent('Worker', label);
+                if (agent) {
+                    activeAgents.set(agent.id, agent);
+                    addLine('🤖 Sub-agent spawned: ' + label, 'terminal-system');
+                    
+                    // Auto-remove after task (simulated - real would use session events)
+                    // For now, remove after 2 minutes or when "complete" message received
+                }
+            }
+            
+            // Check for completion patterns
+            const completePatterns = [
+                /task.*complete/gi,
+                /mission.*complete/gi,
+                /agents?\s+(?:done|finished|completed)/gi,
+                /all\s+\d+\s+agents?\s+done/gi
+            ];
+            
+            for (const pattern of completePatterns) {
+                if (pattern.test(message)) {
+                    // Remove oldest agent
+                    if (activeAgents.size > 0) {
+                        const firstKey = activeAgents.keys().next().value;
+                        const removed = window.triedgeOffice.removeSubAgent(firstKey);
+                        if (removed) {
+                            activeAgents.delete(firstKey);
+                            addLine('✅ Sub-agent completed: ' + removed.label, 'terminal-system');
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        
+        // Connect WebSocket - auto-detect hostname and protocol
+        console.log('🔌 Connecting to bridge...');
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsHost = window.location.host || 'localhost:3737';
+        const wsUrl = `${wsProtocol}//${wsHost}`;
+        console.log('🌐 WebSocket URL:', wsUrl);
+        const ws = new WebSocket(wsUrl);
+        
+        ws.onopen = () => {
+            console.log('✅ WebSocket connected to', wsUrl);
+            addLine('✅ Real-time bridge connected', 'terminal-system');
+        };
+        
+        ws.onmessage = (event) => {
+            console.log('📨 Message received:', event.data);
+            try {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'response') {
+                    console.log('🔱 RESPONSE:', data.message);
+                    typingDiv.classList.remove('active');
+                    
+                    // Set Deshon to idle state after responding
+                    if (window.triedgeOffice) {
+                        window.triedgeOffice.setDeshonState('idle');
+                    }
+                    
+                    // Check for spawned agents in response
+                    detectSpawnedAgents(data.message);
+                    
+                    // Format multi-line responses
+                    const lines = data.message.split('\n').map(l => escapeHtml(l)).join('<br>');
+                    addLine('🔱 ' + lines, 'terminal-response');
+                }
+                
+                if (data.type === 'typing') {
+                    console.log('⌨️ Typing:', data.value);
+                    if (data.value) {
+                        typingDiv.classList.add('active');
+                        // Set Deshon to thinking state while typing
+                        if (window.triedgeOffice) {
+                            window.triedgeOffice.setDeshonState('thinking');
+                        }
+                    } else {
+                        typingDiv.classList.remove('active');
+                    }
+                }
+                
+                if (data.type === 'connected') {
+                    console.log('🔗 Session:', data.sessionId);
+                }
+            } catch (e) {
+                console.error('Parse error:', e);
+            }
+        };
+        
+        ws.onerror = (e) => {
+            console.error('❌ WebSocket error:', e);
+            console.error('Failed to connect to:', wsUrl);
+            addLine('❌ WebSocket connection failed - check console', 'terminal-error');
+        };
+        ws.onclose = (e) => {
+            console.log('🔌 Disconnected. Code:', e.code, 'Reason:', e.reason);
+            addLine('⚠️ Bridge disconnected - refresh to reconnect', 'terminal-error');
+        };
+        
+        function sendMessage() {
+            const text = input.value.trim();
+            if (!text) return;
+            
+            // Local commands for testing agent visualization
+            if (text.startsWith('/')) {
+                handleLocalCommand(text);
+                input.value = '';
+                return;
+            }
+            
+            if (ws.readyState !== WebSocket.OPEN) {
+                addLine('❌ Not connected to bridge', 'terminal-error');
+                return;
+            }
+            
+            addLine('<span class="terminal-prompt">Ψ $</span> ' + escapeHtml(text), 'terminal-user');
+            ws.send(JSON.stringify({ type: 'send', message: text }));
+            input.value = '';
+            
+            // Set Deshon to working state after sending command
+            if (window.triedgeOffice) {
+                window.triedgeOffice.setDeshonState('working');
+            }
+        }
+        
+        function handleLocalCommand(cmd) {
+            const parts = cmd.split(' ');
+            const command = parts[0].toLowerCase();
+            
+            switch (command) {
+                case '/spawn':
+                    if (window.triedgeOffice) {
+                        const name = parts[1] || 'Worker';
+                        const agent = window.triedgeOffice.addSubAgent(name, name);
+                        if (agent) {
+                            activeAgents.set(agent.id, agent);
+                            addLine('🤖 Spawned: ' + name + ' (desk ' + agent.desk + ')', 'terminal-system');
+                        } else {
+                            addLine('❌ Max 4 agents (desks full)', 'terminal-error');
+                        }
+                    }
+                    break;
+                    
+                case '/clear':
+                    if (window.triedgeOffice) {
+                        window.triedgeOffice.clearSubAgents();
+                        activeAgents.clear();
+                        addLine('🧹 All agents cleared', 'terminal-system');
+                    }
+                    break;
+                    
+                case '/agents':
+                    if (window.triedgeOffice) {
+                        const count = window.triedgeOffice.subAgents.length;
+                        addLine('🤖 Active agents: ' + count + '/4', 'terminal-system');
+                        window.triedgeOffice.subAgents.forEach(a => {
+                            addLine('   • ' + a.name + ' (desk ' + a.desk + ')', 'terminal-system');
+                        });
+                    }
+                    break;
+                    
+                case '/pikachu':
+                    if (window.triedgeOffice) {
+                        window.triedgeOffice.addPokemon('pikachu');
+                        addLine('⚡ Pikachu joined your team!', 'terminal-system');
+                    }
+                    break;
+                    
+                case '/charmander':
+                    if (window.triedgeOffice) {
+                        window.triedgeOffice.addPokemon('charmander');
+                        addLine('🔥 Charmander joined your team!', 'terminal-system');
+                    }
+                    break;
+                    
+                case '/help':
+                    addLine('📖 Local commands:', 'terminal-system');
+                    addLine('   /pikachu - Add Pikachu to team', 'terminal-system');
+                    addLine('   /charmander - Add Charmander to team', 'terminal-system');
+                    addLine('   /spawn [name] - Add sub-agent to office', 'terminal-system');
+                    addLine('   /clear - Remove all agents', 'terminal-system');
+                    addLine('   /agents - List active agents', 'terminal-system');
+                    break;
+                    
+                default:
+                    addLine('❓ Unknown command. Try /help', 'terminal-error');
+            }
+        }
+        
+        sendBtn.addEventListener('click', sendMessage);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        console.log('🔱 Terminal initialized');
+        
+        // Register Service Worker for PWA (non-blocking, iOS-friendly)
+        if ('serviceWorker' in navigator) {
+            // Delay SW registration to not block initial page load
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => {
+                        console.log('🔱 Service Worker registered:', reg.scope);
+                        addLine('✨ PWA mode enabled', 'terminal-system');
+                    })
+                    .catch(err => {
+                        console.warn('⚠️ SW registration failed (app will still work):', err);
+                        addLine('⚠️ PWA mode unavailable (limited offline support)', 'terminal-system');
+                    });
+            });
+        } else {
+            console.log('ℹ️ Service Workers not supported');
+        }
+    </script>
+</body>
+</html>
+<!-- Cache bust: 1771171397 -->
+
+<script>
+// IMAGE DROP SUPPORT FOR TERMINAL
+(function() {
+    const terminalOutput = document.getElementById('terminal-output');
+    const terminalContainer = document.getElementById('terminal-section');
+    
+    if (!terminalOutput || !terminalContainer) return;
+    
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        terminalContainer.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    // Highlight drop zone when dragging
+    ['dragenter', 'dragover'].forEach(eventName => {
+        terminalContainer.addEventListener(eventName, () => {
+            terminalContainer.style.background = 'rgba(155, 188, 15, 0.1)';
+            terminalContainer.style.borderColor = '#9bbc0f';
+        }, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        terminalContainer.addEventListener(eventName, () => {
+            terminalContainer.style.background = '';
+            terminalContainer.style.borderColor = '';
+        }, false);
+    });
+    
+    // Handle dropped files
+    terminalContainer.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        handleFiles(files);
+    }
+    
+    function handleFiles(files) {
+        [...files].forEach(file => {
+            if (file.type.startsWith('image/')) {
+                uploadImage(file);
+            } else {
+                addLine(`⚠️ Only image files supported (got: ${file.type})`, 'terminal-error');
+            }
+        });
+    }
+    
+    function uploadImage(file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.maxWidth = '100%';
+            img.style.borderRadius = '4px';
+            img.style.marginTop = '8px';
+            img.style.border = '1px solid #306230';
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'terminal-line';
+            wrapper.innerHTML = `<div style="color: #9bbc0f; margin-bottom: 4px;">📸 Image dropped: ${file.name}</div>`;
+            wrapper.appendChild(img);
+            
+            terminalOutput.appendChild(wrapper);
+            scrollToBottom();
+            
+            // Send to backend (if bridge is connected)
+            sendImageToBackend(e.target.result, file.name);
+        };
+        
+        reader.readAsDataURL(file);
+    }
+    
+    async function sendImageToBackend(dataUrl, filename) {
+        addLine(`📤 Uploading ${filename}...`, 'terminal-system');
+        
+        try {
+            const response = await fetch('http://localhost:3737/upload-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dataUrl, filename })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                addLine(`✅ Uploaded to OpenClaw: ${result.filename}`, 'terminal-system');
+            } else {
+                addLine(`❌ Upload failed: ${result.error}`, 'terminal-error');
+            }
+        } catch (error) {
+            addLine(`❌ Upload error: ${error.message}`, 'terminal-error');
+        }
+    }
+})();
+</script>

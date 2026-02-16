@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#0f380f"/>
+  
+  <!-- Screen border -->
+  <rect x="40" y="40" width="432" height="432" rx="20" fill="#306230"/>
+  
+  <!-- Screen -->
+  <rect x="60" y="60" width="392" height="392" rx="10" fill="#8bac0f"/>
+  
+  <!-- Trident -->
+  <g fill="none" stroke="#0f380f" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Center prong -->
+    <line x1="256" y1="140" x2="256" y2="320"/>
+    
+    <!-- Left prong -->
+    <path d="M180 180 L180 260 Q180 290 256 290"/>
+    
+    <!-- Right prong -->
+    <path d="M332 180 L332 260 Q332 290 256 290"/>
+  </g>
+  
+  <!-- Prong tips -->
+  <circle cx="256" cy="130" r="18" fill="#0f380f"/>
+  <circle cx="180" cy="170" r="15" fill="#0f380f"/>
+  <circle cx="332" cy="170" r="15" fill="#0f380f"/>
+  
+  <!-- Handle -->
+  <rect x="230" y="330" width="52" height="40" rx="5" fill="#0f380f"/>
+  
+  <!-- Text -->
+  <text x="256" y="420" font-family="monospace" font-size="48" font-weight="bold" fill="#0f380f" text-anchor="middle">TRIEDGE</text>
+</svg>
