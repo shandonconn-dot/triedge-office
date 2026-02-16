@@ -85,51 +85,49 @@ wss.on('connection', (ws, req) => {
 });
 
 /**
- * Send message to OpenClaw gateway using HTTP API
+ * Send message to OpenClaw gateway by writing to stdin
  */
 async function sendToGateway(text) {
     return new Promise((resolve, reject) => {
-        const postData = JSON.stringify({
-            message: text,
-            sessionKey: 'agent:main'
+        const { spawn } = require('child_process');
+        
+        // Spawn OpenClaw in interactive mode
+        const proc = spawn('bash', ['-c', `echo "${text.replace(/"/g, '\\"')}" | openclaw`], {
+            stdio: ['pipe', 'pipe', 'pipe'],
+            shell: true
         });
         
-        const options = {
-            hostname: 'localhost',
-            port: 18789,
-            path: '/api/v1/sessions/send',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': postData.length,
-                'Authorization': `Bearer ${GATEWAY_TOKEN}`
+        let output = '';
+        let errorOutput = '';
+        
+        proc.stdout.on('data', (data) => {
+            output += data.toString();
+        });
+        
+        proc.stderr.on('data', (data) => {
+            errorOutput += data.toString();
+        });
+        
+        proc.on('close', (code) => {
+            if (code !== 0 && code !== null) {
+                console.error('OpenClaw exited with code:', code);
+                console.error('Stderr:', errorOutput);
+                resolve('Error communicating with OpenClaw');
+                return;
             }
-        };
-        
-        const req = http.request(options, (res) => {
-            let data = '';
             
-            res.on('data', (chunk) => {
-                data += chunk;
-            });
+            // Clean up the output
+            const cleaned = output
+                .replace(/\x1b\[[0-9;]*m/g, '') // Remove ANSI codes
+                .trim();
             
-            res.on('end', () => {
-                try {
-                    const response = JSON.parse(data);
-                    resolve(response.reply || response.message || 'No response');
-                } catch (err) {
-                    resolve(data || 'No response from OpenClaw');
-                }
-            });
+            resolve(cleaned || 'No response');
         });
         
-        req.on('error', (error) => {
-            console.error('Gateway error:', error.message);
-            resolve('Error communicating with OpenClaw');
-        });
-        
-        req.write(postData);
-        req.end();
+        setTimeout(() => {
+            proc.kill();
+            resolve('Request timed out');
+        }, 30000); // 30 second timeout
     });
 }
 
